@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - ParkEase</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#0b1220;color:#eef2ff}
+    .admin-card{width:min(100%,420px);padding:32px;border:1px solid #29344d;border-radius:20px;background:#111b2e;box-shadow:0 20px 60px #0005}
+    .admin-card h1{margin-bottom:8px}.admin-card p{color:#b9c3d8}.admin-card label{display:block;margin:16px 0 6px}
+    .admin-card input{width:100%;padding:13px;border:1px solid #34415b;border-radius:10px;background:#0b1220;color:white;box-sizing:border-box}
+    .admin-card button{width:100%;margin-top:22px;padding:13px;border:0;border-radius:10px;background:#7c3aed;color:white;font-weight:700;cursor:pointer}
+    .admin-card a{color:#c4b5fd}.lock{font-size:38px}
+  </style>
+</head>
+<body>
+  <main class="admin-card">
+    <div class="lock">🔐</div>
+    <h1>ParkEase Admin</h1>
+    <p>Sign in to manage parking activity.</p>
+    <form id="adminForm">
+      <label for="username">Admin username</label>
+      <input id="username" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Login as Admin</button>
+    </form>
+    <p><a href="login.html">Back to user login</a></p>
+  </main>
+  <script src="api.js"></script>
+  <script>
+    document.getElementById("adminForm").addEventListener("submit", async function(event){
+      event.preventDefault();
+      const username=document.getElementById("username").value.trim();
+      const password=document.getElementById("password").value;
+      try {
+        await apiRequest("/api/admin/login", {method:"POST", body:JSON.stringify({username,password})});
+        location.href="admin-dashboard.html";
+      } catch(error) { alert(error.message); }
+    });
+  </script>
+</body>
+</html>

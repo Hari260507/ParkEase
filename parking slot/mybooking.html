@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - ParkEase</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .booking-card {
+            margin: 18px 0;
+            padding: 20px;
+            text-align: left;
+            border: 1px solid #414566;
+            border-radius: 14px;
+            background: #171b32;
+        }
+
+        .booking-card h2 { color: #c4b5fd; }
+        .booking-card p { margin: 8px 0; overflow-wrap: anywhere; }
+
+        .status {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            background: #123c36;
+            color: #6ee7b7;
+        }
+
+        .cancelled { background: #4b2028; color: #fca5a5; }
+        .completed { background: #33334b; color: #d1d5db; }
+
+        .cancel-btn {
+            margin-top: 12px;
+            padding: 10px 16px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .tools input, .tools select {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>My Bookings</h1>
+    <p id="welcome"></p>
+
+    <div class="tools">
+        <input id="search" placeholder="Search slot or vehicle"
+               oninput="showBookings()">
+
+        <select id="filter" onchange="showBookings()">
+            <option value="all">All Bookings</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+        </select>
+    </div>
+
+    <p id="bookingCount"></p>
+    <div id="bookingList"></div>
+
+    <button onclick="goDashboard()">Back to Dashboard</button>
+    <button onclick="editProfile()">Edit My Details</button>
+</div>
+
+<script src="api.js"></script>
+<script>
+
+let allBookings=[];
+(async function init(){try{const me=(await apiRequest("/api/me")).user;document.getElementById("welcome").textContent="Welcome, "+me.name+"!";await showBookings();}catch(e){alert("Please login first.");location.href="login.html";}})();
+async function showBookings(){
+ const list=document.getElementById("bookingList");list.replaceChildren();
+ try {allBookings=(await apiRequest("/api/bookings")).bookings;}catch(e){return;}
+ const search=document.getElementById("search").value.trim().toUpperCase(),filter=document.getElementById("filter").value;
+ const items=allBookings.filter(b=>(filter==="all"||b.status.toLowerCase()===filter)&&((b.slot||"").toUpperCase().includes(search)||(b.vehicle||"").toUpperCase().includes(search)));
+ document.getElementById("bookingCount").textContent="Bookings found: "+items.length;
+ if(!items.length){const h=document.createElement("h2");h.textContent="No bookings found";list.appendChild(h);return;}
+ items.forEach(b=>{
+ const card=document.createElement("div");card.className="booking-card";
+ const h=document.createElement("h2");h.textContent="Slot "+b.slot;card.appendChild(h);
+ [["Status",b.status],["Vehicle",b.vehicle],["Date",b.date],["Start time",b.time],["Duration",Math.floor(b.duration/60)+"h "+(b.duration%60)+"m"],["End time",new Date(b.end_time).toLocaleString()]].forEach(([k,v])=>{const p=document.createElement("p");p.textContent=k+": "+v;card.appendChild(p);});
+ if(b.status==="Active"){const btn=document.createElement("button");btn.className="cancel-btn";btn.textContent="Cancel Booking";btn.onclick=()=>cancelBooking(b.id);card.appendChild(btn);}
+ list.appendChild(card);
+ });
+}
+async function cancelBooking(id){if(!confirm("Cancel this booking?"))return;try{await apiRequest("/api/bookings/"+id+"/cancel",{method:"POST"});alert("Booking cancelled.");showBookings();}catch(e){alert(e.message);}}
+function goDashboard(){location.href="dashboard.html";}
+function editProfile(){location.href="profile.html";}
+document.getElementById("search").addEventListener("input",showBookings);document.getElementById("filter").addEventListener("change",showBookings);
+
+</script>
+</body>
+</html>

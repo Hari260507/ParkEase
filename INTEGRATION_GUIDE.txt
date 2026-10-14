@@ -1,0 +1,37 @@
+PARKEASE STEP 4 — BROWSER NOTIFICATIONS
+
+IMPORTANT
+- This is a browser-side add-on for the existing prototype.
+- Notifications need browser permission.
+- Reminders are checked only while a ParkEase page with notifications.js remains open.
+- A browser notification is NOT guaranteed if the browser is closed, the device sleeps, or the operating system blocks notifications.
+- This does not replace backend/server-side reminders.
+
+1) Copy notifications.js into the same folder as your HTML files.
+
+2) Add this line just before </body> on pages where you want reminders (for example confirmation.html and dashboard.html):
+   <script src="notifications.js"></script>
+
+3) Add an enable button on a page, for example dashboard.html:
+   <button type="button" onclick="ParkEaseNotifications.enable()">Enable Notifications</button>
+
+4) When your existing booking code confirms a booking, add this AFTER the booking is successfully saved.
+   Replace `slotName` with the actual variable used in your project:
+   if (window.ParkEaseNotifications) {
+       ParkEaseNotifications.bookingSuccess(slotName);
+   }
+
+5) To schedule a reminder, use the actual booking ID, slot, and end date/time from your existing booking data:
+   if (window.ParkEaseNotifications) {
+       ParkEaseNotifications.scheduleExpiryReminder(bookingId, slotName, bookingEndDateTime);
+   }
+   `bookingEndDateTime` must be a date/time JavaScript can parse, such as `2026-10-12T16:30:00`.
+
+6) Save files, stop the server with Ctrl+C, restart with `py app.py`, then refresh the browser.
+   Open the site on localhost, click Enable Notifications, and choose Allow.
+
+TESTING
+- Test booking-success notification first.
+- For an expiry reminder test, set the booking end time about 6 minutes in the future and keep the ParkEase page open.
+- Existing variable names differ across projects. Do not paste the integration calls blindly if your booking code uses different names; inspect the code and substitute the real variables.
+- Keep a backup copy of your current files before changing them.

@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - ParkEase</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="luxury-black-gold.css">
+<link rel="stylesheet" href="theme-toggle.css">
+</head>
+<body>
+<div class="container">
+    <h1>My Profile</h1>
+    <p>Edit your saved details here.</p>
+
+    <input id="name" type="text" placeholder="Full Name">
+    <input id="address" type="text" placeholder="Address">
+    <input id="vehicle" type="text" placeholder="Vehicle Number">
+    <input id="type" type="text" placeholder="Vehicle Type">
+    <input id="phone" type="tel" readonly>
+    <input id="password" type="password" placeholder="New password (optional)">
+
+    <button onclick="saveProfile()">Save Changes</button>
+    <button onclick="goBack()">Back to My Bookings</button>
+</div>
+
+<script src="api.js"></script>
+<script>
+
+let user=null;
+(async function loadProfile(){
+ try { user=(await apiRequest("/api/me")).user;
+ ["name","address","vehicle","type","phone"].forEach(k=>document.getElementById(k).value=user[k]||""); }
+ catch(e){alert("Please login first.");location.href="login.html";}
+})();
+async function saveProfile(){
+ const name=document.getElementById("name").value.trim(), address=document.getElementById("address").value.trim();
+ const vehicle=document.getElementById("vehicle").value.trim().toUpperCase(), type=document.getElementById("type").value.trim();
+ const password=document.getElementById("password").value;
+ if(!name||!address||!vehicle||!type){alert("Please fill all details.");return;}
+ try { await apiRequest("/api/profile",{method:"PUT",body:JSON.stringify({name,address,vehicle,type,password})}); alert("Your details have been updated!"); location.href="mybooking.html"; }
+ catch(e){alert(e.message);}
+}
+function goBack(){location.href="mybooking.html";}
+
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if(window.lucide) lucide.createIcons(); });</script>
+<script src="theme-toggle.js"></script>
+</body>
+</html>

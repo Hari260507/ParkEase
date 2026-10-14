@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkEase - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="premium.css">
+
+    <style>
+        .slots .slot.available {
+            background: #16a34a !important;
+            color: white !important;
+            border: 1px solid #15803d !important;
+            opacity: 1;
+        }
+
+        .slots .slot.occupied {
+            background: #dc2626 !important;
+            color: white !important;
+            border: 1px solid #b91c1c !important;
+            opacity: 1;
+            cursor: not-allowed;
+        }
+
+        .slots .slot.ending-soon {
+            background: #eab308 !important;
+            color: #111827 !important;
+            border: 1px solid #ca8a04 !important;
+            opacity: 1;
+        }
+
+        .slot-legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 13px;
+            height: 13px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+    </style>
+<link rel="stylesheet" href="luxury-black-gold.css">
+<link rel="stylesheet" href="theme-toggle.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>ParkEase</h1>
+        <h2>Available Parking Slots</h2>
+        <p style="color:#aab6d0">Choose a mall or cinema hall and location first. Slots are shown only for your selected location.</p>
+
+        <p id="welcomeMessage"></p>
+
+        <div class="slot-legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background:#16a34a"></span>
+                Available
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color" style="background:#dc2626"></span>
+                Occupied
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color" style="background:#eab308"></span>
+                Ending Soon
+            </div>
+        </div>
+
+        <div class="dashboard-stats">
+            <p>Available: <span id="availableCount">0</span></p>
+            <p>Occupied: <span id="occupiedCount">0</span></p>
+            <p>Ending Soon: <span id="endingCount">0</span></p>
+        </div>
+
+        <div class="slot-controls">
+            <input
+                type="text"
+                id="searchSlot"
+                placeholder="Search slot (e.g. A1)"
+                oninput="renderSlots()">
+
+            <select id="statusFilter" onchange="renderSlots()">
+                <option value="all">All Slots</option>
+                <option value="available">Available</option>
+                <option value="occupied">Occupied</option>
+                <option value="ending">Ending Soon</option>
+            </select>
+        </div>
+
+        <div id="slots" class="slots"></div>
+
+        <div class="dashboard-buttons">
+            <button onclick="location.href='places.html'">Choose Mall / Cinema</button>
+            <button onclick="location.href='mybooking.html'">
+                My Bookings
+            </button>
+
+            <button onclick="location.href='profile.html'">
+                My Profile
+            </button>
+
+            <button onclick="location.href='smshistory.html'">
+                <i data-lucide="smartphone"></i> SMS History
+            </button>
+
+            <button onclick="logout()">
+                Logout
+            </button>
+        </div>
+
+    </div>
+
+    <script src="api.js"></script>
+<script>
+
+const params=new URLSearchParams(location.search), placeId=params.get("place"); let placeInfo=null; const slotsContainer=document.getElementById("slots");let currentBookings=[];
+async function loadDashboard(){
+ if(!placeId){location.replace("places.html");return;}
+ try {const data=await apiRequest("/api/me");document.getElementById("welcomeMessage").textContent="Welcome, "+data.user.name+"!";
+ const places=(await apiRequest("/api/places")).places;placeInfo=places.find(p=>p.id===placeId)||places[0];document.getElementById("welcomeMessage").textContent += " — " + placeInfo.name;
+ const result=await apiRequest("/api/slots");currentBookings=result.bookings;renderSlots();}
+ catch(e){alert("Please login first.");location.href="login.html";}
+}
+function getStatus(slot){
+ const now=Date.now(), b=currentBookings.filter(x=>x.slot===slot && new Date(x.end_time).getTime()>now).sort((a,b)=>new Date(a.end_time)-new Date(b.end_time))[0];
+ if(!b)return "available";
+ return new Date(b.end_time).getTime()-now<=10*60000?"ending":"occupied";
+}
+function bookSlot(slot){if(getStatus(slot)!=="available"){alert("This slot is already booked.");return;}location.href="booking.html?slot="+encodeURIComponent(slot);}
+function renderSlots(){
+ if(!slotsContainer)return;
+ const search=document.getElementById("searchSlot").value.trim().toUpperCase(),filter=document.getElementById("statusFilter").value;
+ slotsContainer.replaceChildren();let available=0,occupied=0,ending=0;
+ for(let i=1;i<=100;i++){const slot=placeId+"-"+(i<=40?"A":"B")+(i<=40?i:i-40),status=getStatus(slot);if(status==="available")available++;else if(status==="ending")ending++;else occupied++;
+ if(!slot.includes(search)||(filter==="available"&&status!=="available")||(filter==="occupied"&&status!=="occupied")||(filter==="ending"&&status!=="ending"))continue;
+ const b=document.createElement("button");b.type="button";b.className="slot "+(status==="ending"?"ending-soon":status);b.textContent=slot;
+ if(status==="available")b.onclick=()=>bookSlot(slot);else b.disabled=true;slotsContainer.appendChild(b);}
+ document.getElementById("availableCount").textContent=available;document.getElementById("occupiedCount").textContent=occupied;document.getElementById("endingCount").textContent=ending;
+}
+async function logout(){if(confirm("Are you sure you want to logout?")){try{await apiRequest("/api/logout",{method:"POST"});}catch(e){} location.href="login.html";}}
+document.getElementById("searchSlot").addEventListener("input",renderSlots);document.getElementById("statusFilter").addEventListener("change",renderSlots);
+loadDashboard();setInterval(loadDashboard,10000);
+
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if(window.lucide) lucide.createIcons(); });</script>
+<script src="theme-toggle.js"></script>
+</body>
+</html>

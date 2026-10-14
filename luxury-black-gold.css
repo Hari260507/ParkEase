@@ -1,0 +1,219 @@
+
+/* ParkEase Luxury Black & Gold theme — loaded last on every page */
+:root {
+  --pe-bg: #0b0b0d;
+  --pe-surface: #151518;
+  --pe-card: #1c1c1f;
+  --pe-gold: #e6b85c;
+  --pe-gold-light: #fff0c2;
+  --pe-text: #fff8e8;
+  --pe-muted: #b9b3a6;
+  --pe-border: rgba(230,184,92,.25);
+  --pe-shadow: 0 18px 55px rgba(0,0,0,.32);
+}
+html { color-scheme: dark; }
+body {
+  background: radial-gradient(ellipse at 15% 0%, rgba(230,184,92,.10), transparent 36%),
+              radial-gradient(ellipse at 90% 15%, rgba(230,184,92,.06), transparent 32%),
+              var(--pe-bg) !important;
+  color: var(--pe-text) !important;
+}
+h1,h2,h3,h4,.hero-title,.logo,.brand,.page-title {
+  color: var(--pe-gold-light);
+}
+p, label, small, .subtitle, .muted { color: var(--pe-muted); }
+nav, header, .navbar, .topbar, .sidebar, .header, .site-header {
+  background: rgba(11,11,13,.96) !important;
+  border-color: var(--pe-border) !important;
+}
+.card, .feature-card, .stat-card, .form-card, .login-card, .booking-card,
+.location-card, .place-card, .slot-card, .glass-card, .panel, .content-card,
+.dashboard-card, .info-card, .auth-card {
+  background: linear-gradient(145deg, rgba(38,39,44,.97), rgba(25,27,32,.98)) !important;
+  border: 1px solid var(--pe-border) !important;
+  box-shadow: var(--pe-shadow) !important;
+  color: var(--pe-text) !important;
+}
+button, .btn, .btn-primary, .primary-btn, input[type="submit"], .book-now,
+a.button, .button-primary {
+  background: linear-gradient(135deg, #f4d58a, #c89535) !important;
+  color: #17130b !important;
+  border: 1px solid rgba(255,240,194,.55) !important;
+  box-shadow: 0 8px 24px rgba(230,184,92,.17);
+  font-weight: 700;
+}
+button:hover, .btn:hover, .btn-primary:hover, .primary-btn:hover,
+input[type="submit"]:hover, .book-now:hover, a.button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+input, select, textarea {
+  background: #15171c !important;
+  color: var(--pe-text) !important;
+  border: 1px solid rgba(230,184,92,.32) !important;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--pe-gold) !important;
+  box-shadow: 0 0 0 3px rgba(230,184,92,.13) !important;
+}
+a { color: var(--pe-gold-light); }
+a:hover { color: var(--pe-gold); }
+table, th, td { border-color: var(--pe-border) !important; }
+th { color: var(--pe-gold-light) !important; }
+tr:hover { background: rgba(230,184,92,.045); }
+.available, .slot.available, .status-available { border-color: #55d6a3 !important; }
+.occupied, .slot.occupied, .status-occupied { border-color: #ed7272 !important; }
+.selected, .slot.selected { border-color: var(--pe-gold) !important; box-shadow: 0 0 0 2px rgba(230,184,92,.2) !important; }
+hr, .divider { border-color: var(--pe-border) !important; }
+::selection { background: var(--pe-gold); color: #17130b; }
+
+
+/* Deep-black page background refinement requested by the user */
+html, body { background-color: #0b0b0d !important; }
+body { background-image: radial-gradient(ellipse at 12% 0%, rgba(212,175,55,.075), transparent 38%), radial-gradient(ellipse at 92% 12%, rgba(212,175,55,.035), transparent 34%) !important; }
+main, .main, .main-content, .page, .page-content, .dashboard, .container-fluid { background-color: transparent !important; }
+.card, .feature-card, .stat-card, .form-card, .login-card, .booking-card, .location-card, .place-card, .slot-card, .glass-card, .panel, .content-card, .dashboard-card, .info-card, .auth-card { background: linear-gradient(145deg, #202023, #151518) !important; }
+
+/* FINAL GLOBAL OVERRIDE: remove the old blue/purple page backgrounds everywhere */
+:root {
+  --background: #0b0b0d !important;
+  --surface: #1c1c1f !important;
+  --surface-light: #252528 !important;
+  --primary: #d4af37 !important;
+  --primary-dark: #aa8624 !important;
+  --text: #f5f1e8 !important;
+  --muted: #c1baad !important;
+  --border: rgba(212,175,55,.25) !important;
+  --pe-bg: #0b0b0d !important;
+  --pe-panel: #1c1c1f !important;
+  --pe-card: #252528 !important;
+  --pe-blue: #d4af37 !important;
+  --pe-cyan: #f0d77a !important;
+  --grand-ink: #0b0b0d !important;
+  --grand-panel: #1c1c1f !important;
+  --grand-blue: #d4af37 !important;
+  --grand-cyan: #f0d77a !important;
+}
+html, body {
+  background: #0b0b0d !important;
+  background-image: none !important;
+  color: #f5f1e8;
+}
+body::before, body::after, main::before, main::after,
+.page-bg, .background-glow, .hero-glow, .ambient-glow {
+  background-image: none !important;
+  box-shadow: none !important;
+}
+header, nav, footer, main, section, .hero, .page, .page-container,
+.dashboard, .dashboard-container, .content, .main-content, .container,
+.auth-page, .login-page, .signup-page, .booking-page, .locations-page,
+.admin-page, .profile-page, .history-page {
+  background-color: transparent;
+}
+.card, .panel, .glass-card, .feature-card, .stat-card, .slot-card,
+.booking-card, .form-card, .login-card, .signup-card, .location-card,
+.modal-content, .table-container, .dashboard-card {
+  background-color: #1c1c1f !important;
+  background-image: none !important;
+  border-color: rgba(212,175,55,.24) !important;
+}
+button, .btn-primary, .primary-btn, .cta-button, input[type="submit"] {
+  background: linear-gradient(135deg, #d4af37, #a98220) !important;
+  color: #111111 !important;
+  border-color: #d4af37 !important;
+}
+a:not(.btn):not(.button) { color: #e6c65b; }
+
+
+/* FINAL ACTUAL FIX: remove blue/purple page backgrounds site-wide */
+html, body, body.home-page, .home-page, .home-navbar, .home-hero, .home-footer, .home-section, .hero, .page-bg, .auth-page, .login-page, .signup-page, .booking-page, .locations-page, .admin-page, .profile-page, .history-page { background-color:#0b0b0d !important; background-image:none !important; }
+.home-navbar { background:#0b0b0d !important; border-color:rgba(212,175,55,.25) !important; }
+.home-label { background:rgba(212,175,55,.10) !important; border-color:rgba(212,175,55,.35) !important; color:#f0d77a !important; }
+.home-hero h1 span, .home-logo span { color:#d4af37 !important; }
+.home-nav-login, .home-primary-btn, .home-nav-login:hover, .home-primary-btn:hover { background:linear-gradient(135deg,#d4af37,#aa8624) !important; color:#111 !important; }
+.home-secondary-btn, .home-feature-card, .home-parking-preview, .home-feature, .home-card { background:#1c1c1f !important; border-color:rgba(212,175,55,.25) !important; }
+
+
+/* FINAL GLOBAL OVERRIDE: remove remaining blue/purple surfaces across every page */
+html, body, .home-page, main, .main-content, .page, .page-content, .dashboard,
+.dashboard-page, .booking-page, .profile-page, .admin-page, .content,
+body.login-page, body.signup-page {
+  background-color: #0b0b0d !important;
+  background-image: radial-gradient(ellipse at 12% 0%, rgba(212,175,55,.055), transparent 34%),
+                    #0b0b0d !important;
+  color: #f5f1e8 !important;
+}
+.home-navbar, .home-navbar *, .topbar, .navbar, .header, .site-header {
+  border-color: rgba(212,175,55,.28) !important;
+}
+.home-navbar, .topbar, .navbar, .header, .site-header, nav {
+  background: rgba(11,11,13,.98) !important;
+}
+.home-hero, .hero, .hero-section, .hero-visual, .parking-preview,
+.login-container, .auth-card, .form-card, .container,
+.feature-card, .stat-card, .card, .panel, .content-card, .dashboard-card,
+.booking-card, .info-card, .location-card, .place-card, .slot-card {
+  background-color: #1c1c1f !important;
+  background-image: none !important;
+  border-color: rgba(212,175,55,.28) !important;
+}
+.card-art, .place-card .card-art, .place-card.cinema .card-art,
+.place-card.mall .card-art, .place-card::before {
+  background: linear-gradient(135deg, #24211a, #111113 72%) !important;
+  border-color: rgba(212,175,55,.3) !important;
+}
+.home-logo-icon, .brand-mark, .logo-icon, .parking-logo {
+  background: linear-gradient(135deg,#d4af37,#f5df91) !important;
+  color: #17130b !important;
+  border: 1px solid rgba(255,240,194,.7) !important;
+  box-shadow: 0 8px 24px rgba(212,175,55,.18) !important;
+}
+.brand-mark {
+  border-radius: 15px !important;
+  font-size: 0 !important;
+  position: relative;
+}
+.brand-mark::after {
+  content: "P";
+  font-size: 25px;
+  font-weight: 900;
+  color: #17130b;
+}
+.home-logo-icon { color: #17130b !important; }
+.home-logo-icon svg, .home-logo-icon i { color: #17130b !important; stroke: #17130b !important; }
+.home-label, .eyebrow, .badge, .place-type, .home-badge {
+  border-color: rgba(212,175,55,.4) !important;
+}
+h1,h2,h3,h4,.home-title,.hero-title,.place-card h3,.brand {
+  color: #fff0c2 !important;
+}
+a, .nav-btn, .home-nav-links a { color: #e6c568 !important; }
+button, .btn, .home-btn-primary, .nav-btn.primary, .place-card .choose-btn,
+input[type=submit], .button-primary {
+  background: linear-gradient(135deg,#f5dc8b,#c99b32) !important;
+  color: #17130b !important;
+  border-color: rgba(255,240,194,.55) !important;
+}
+input, select, textarea { background:#171719 !important; color:#fff8e8 !important; border-color:rgba(212,175,55,.3) !important; }
+
+/* Login page: enforce readable Black & Gold button text */
+.login-container .login-button,
+.login-container .signup-button,
+.login-container button[type="submit"],
+.login-container button[type="button"] {
+  color: #17130b !important;
+  -webkit-text-fill-color: #17130b !important;
+  background: linear-gradient(135deg, #f5dc8b 0%, #d4af37 55%, #b88a22 100%) !important;
+  border: 1px solid #f5dc8b !important;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+.login-container .login-button:hover,
+.login-container .signup-button:hover {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  filter: brightness(1.08);
+}

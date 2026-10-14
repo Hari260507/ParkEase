@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+:root{--pe-bg:#0b0b0d;--pe-panel:#1c1c1f;--pe-blue:#d4af37;--pe-cyan:#f0d77a;--pe-text:#f5f7ff;--pe-muted:#a8b3ca}
+body{font-family:'Manrope',sans-serif!important}
+.home-page{font-family:'Manrope',sans-serif!important;background:radial-gradient(ellipse at 78% 8%,rgba(69,105,255,.22),transparent 35%),radial-gradient(ellipse at 10% 65%,rgba(45,218,202,.10),transparent 32%),#0b0b0d!important;color:var(--pe-text)}
+.home-navbar{position:sticky;top:0;z-index:20;padding:18px 7%;background:rgba(7,11,22,.82)!important;backdrop-filter:blur(18px);border-bottom:1px solid rgba(142,164,220,.15)!important}
+.home-logo{font-family:'Outfit',sans-serif!important;letter-spacing:-.7px}.home-logo-icon{border-radius:14px!important;background:linear-gradient(135deg,#d4af37,#f0d77a)!important;box-shadow:0 8px 30px #426dff55}
+.home-nav-links a{transition:.2s ease}.home-nav-links a:hover{color:var(--pe-cyan)!important}
+.home-hero{padding-top:85px!important;padding-bottom:90px!important;gap:56px!important}
+.home-label{border:1px solid #d4af3755!important;background:#d4af3714!important;border-radius:999px!important;color:#a9c2ff!important;letter-spacing:1.2px}
+.home-hero h1,.home-hero h2{font-family:'Outfit',sans-serif!important;letter-spacing:-2px!important;line-height:1.04!important}
+.home-hero h1{font-size:clamp(42px,5.2vw,72px)!important}
+.home-hero h1 span,.home-hero h2 span{background:linear-gradient(100deg,#78a2ff,#4de3d2);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.home-hero-description{color:#b8c4db!important;line-height:1.85!important;font-size:16px!important}
+.home-primary-btn{border:0!important;border-radius:14px!important;background:linear-gradient(110deg,#537fff,#45cfcf)!important;box-shadow:0 12px 32px #527cff40!important;transition:transform .2s,box-shadow .2s!important}.home-primary-btn:hover{transform:translateY(-3px);box-shadow:0 16px 38px #527cff60!important}
+.home-secondary-btn{border-radius:14px!important;border:1px solid #8fa8d544!important;background:#ffffff08!important}
+.home-visual{border:1px solid #91a8e22b!important;border-radius:28px!important;background:linear-gradient(145deg,#18243b,#0d1424 72%)!important;box-shadow:0 30px 90px #0008, inset 0 1px #ffffff10!important;transform:perspective(1200px) rotateY(-3deg)}
+.home-visual-header,.home-visual-footer{border-color:#ffffff12!important}.home-parking-slot{border-radius:14px!important;transition:transform .2s,filter .2s}.home-parking-slot:hover{transform:translateY(-4px);filter:brightness(1.15)}
+#features{padding-top:75px!important;padding-bottom:85px!important}#features h2,#features h3{font-family:'Outfit',sans-serif!important}
+.home-feature-card{border:1px solid #8ea7df20!important;border-radius:20px!important;background:linear-gradient(145deg,#141e33,#0d1423)!important;box-shadow:0 18px 45px #0002!important;transition:transform .25s,border-color .25s!important}.home-feature-card:hover{transform:translateY(-6px);border-color:#d4af3788!important}
+.home-page section{scroll-margin-top:90px}
+@media(max-width:800px){.home-hero{padding-top:48px!important;padding-bottom:55px!important;gap:35px!important}.home-visual{transform:none!important}.home-hero h1{letter-spacing:-1.2px!important}.home-navbar{padding:15px 5%!important}}
+/* Shared login/signup font refresh */
+body:not(.home-page){font-family:'Manrope',sans-serif!important;background:radial-gradient(ellipse at top right,#1a2d55 0%,transparent 42%),linear-gradient(135deg,#0b0b0d,#1c1c1f)!important}
+.container.login-container,.login-container{font-family:'Manrope',sans-serif!important;border:1px solid #8ea7df2c!important;border-radius:24px!important;background:linear-gradient(145deg,#172238,#0e1525)!important;box-shadow:0 25px 75px #0007,0 0 0 1px #ffffff05!important}
+.login-container h1,.login-container h2{font-family:'Outfit',sans-serif!important;letter-spacing:-.6px!important;color:#f5f7ff!important}
+.login-container p,.login-container label{color:#b8c4db!important}.login-container input,.login-container select{font-family:'Manrope',sans-serif!important;border-radius:12px!important;background:#080f1e!important;color:#f5f7ff!important;border:1px solid #91a8e233!important}.login-container input:focus{outline:none!important;border-color:#6b93ff!important;box-shadow:0 0 0 3px #d4af3722!important}
+.login-container button,.login-container input[type=submit]{font-family:'Manrope',sans-serif!important;font-weight:800!important;border-radius:12px!important;background:linear-gradient(110deg,#537fff,#45cfcf)!important;border:0!important}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParkEase Admin Dashboard</title><link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="premium.css">
+<style>
+ body{background:#0b0b0d;color:#eef2ff}.admin-wrap{max-width:1200px;margin:25px auto;padding:20px}
+ .admin-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.admin-head p{color:#aab6cc}
+ .admin-head button,.refresh{background:#d4af37;color:white;border:0;border-radius:9px;padding:10px 16px;cursor:pointer}
+ .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:24px 0}
+ .stat{background:#1c1c1f;border:1px solid #29344d;border-radius:15px;padding:18px}.stat span{display:block;color:#aab6cc;font-size:14px}.stat strong{display:block;font-size:30px;margin-top:8px}
+ .panel{background:#1c1c1f;border:1px solid #29344d;border-radius:15px;padding:18px;margin:18px 0;overflow-x:auto}
+ table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;padding:11px;border-bottom:1px solid #29344d;font-size:13px}th{color:#f5e7ad}
+ .tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button{padding:9px 14px;border-radius:8px;border:1px solid #34415b;background:#17243a;color:#fff;cursor:pointer}.tabs button.active{background:#d4af37}
+ .status{padding:4px 8px;border-radius:6px;background:#23334b}.muted{color:#aab6cc}.error{color:#fca5a5}
+ @media(max-width:600px){.admin-wrap{padding:10px}.stat strong{font-size:24px}}
+</style><link rel="stylesheet" href="luxury-black-gold.css">
+<link rel="stylesheet" href="theme-toggle.css">
+</head>
+<body><main class="admin-wrap">
+<header class="admin-head"><div><h1><i data-lucide="parking-circle"></i> ParkEase Admin</h1><p>Parking system overview and management</p></div><div><button class="refresh" onclick="loadAll()">Refresh</button> <button class="refresh" onclick="downloadReport('bookings')">⬇ Booking CSV</button> <button class="refresh" onclick="downloadReport('users')">⬇ Users CSV</button> <button onclick="logout()">Logout</button></div></header>
+<p id="notice" class="muted">Loading dashboard...</p>
+<section class="stat-grid">
+<div class="stat"><span>Total Parking Slots</span><strong id="totalSlots">—</strong></div>
+<div class="stat"><span>Available Slots</span><strong id="availableSlots">—</strong></div>
+<div class="stat"><span>Currently Occupied</span><strong id="occupiedSlots">—</strong></div>
+<div class="stat"><span>Registered Users</span><strong id="usersCount">—</strong></div>
+<div class="stat"><span>Active Bookings</span><strong id="activeCount">—</strong></div>
+<div class="stat"><span>Completed Bookings</span><strong id="completedCount">—</strong></div>
+<div class="stat"><span>Cancelled Bookings</span><strong id="cancelledCount">—</strong></div>
+</section>
+<section class="panel"><div class="tabs"><button id="bookingsTab" class="active" onclick="showTab('bookings')">All Bookings</button><button id="usersTab" onclick="showTab('users')">Registered Users</button></div>
+<div id="bookingsPanel"><h2>Recent Bookings</h2><div id="bookingsTable" class="muted">Loading...</div></div>
+<div id="usersPanel" hidden><h2>Registered Users</h2><div id="usersTable" class="muted">Loading...</div></div></section>
+</main>
+<script src="api.js"></script><script>
+function esc(value){return String(value??"").replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function showTab(tab){const isBookings=tab==='bookings';document.getElementById('bookingsPanel').hidden=!isBookings;document.getElementById('usersPanel').hidden=isBookings;document.getElementById('bookingsTab').classList.toggle('active',isBookings);document.getElementById('usersTab').classList.toggle('active',!isBookings);}
+async function loadAll(){
+ try{
+  const [s,b,u]=await Promise.all([apiRequest('/api/admin/summary'),apiRequest('/api/admin/bookings'),apiRequest('/api/admin/users')]);
+  document.getElementById('totalSlots').textContent=s.total_slots;document.getElementById('availableSlots').textContent=s.available_slots;document.getElementById('occupiedSlots').textContent=s.occupied_slots;document.getElementById('usersCount').textContent=s.users;document.getElementById('activeCount').textContent=s.active_bookings;document.getElementById('completedCount').textContent=s.completed_bookings;document.getElementById('cancelledCount').textContent=s.cancelled_bookings;
+  if(!b.bookings.length) document.getElementById('bookingsTable').innerHTML='No bookings yet.'; else document.getElementById('bookingsTable').innerHTML='<table><thead><tr><th>ID</th><th>User</th><th>Phone</th><th>Slot</th><th>Vehicle</th><th>Date</th><th>Time</th><th>Duration</th><th>Status</th></tr></thead><tbody>'+b.bookings.map(x=>`<tr><td>${esc(x.id)}</td><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.slot)}</td><td>${esc(x.vehicle)}</td><td>${esc(x.date)}</td><td>${esc(x.time)}</td><td>${esc(x.duration)} min</td><td><span class="status">${esc(x.status)}</span></td></tr>`).join('')+'</tbody></table>';
+  if(!u.users.length) document.getElementById('usersTable').innerHTML='No registered users yet.'; else document.getElementById('usersTable').innerHTML='<table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Address</th><th>Vehicle</th><th>Type</th><th>Bookings</th><th>Registered</th></tr></thead><tbody>'+u.users.map(x=>`<tr><td>${esc(x.id)}</td><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.address)}</td><td>${esc(x.vehicle)}</td><td>${esc(x.vehicle_type)}</td><td>${esc(x.booking_count)}</td><td>${esc(x.created_at)}</td></tr>`).join('')+'</tbody></table>';
+  document.getElementById('notice').textContent='Dashboard updated successfully.';
+ }catch(e){document.getElementById('notice').textContent=e.message;document.getElementById('notice').className='error';if(e.message.toLowerCase().includes('admin login'))location.href='admin-login.html';}
+}
+function downloadReport(type){const file=type==='users'?'users.csv':'bookings.csv';window.location.href='/api/admin/export/'+file;}
+async function logout(){try{await apiRequest('/api/admin/logout',{method:'POST'});}catch(e){}location.href='admin-login.html';}
+loadAll();setInterval(loadAll,30000);
+</script><script src="https://unpkg.com/lucide@latest"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if(window.lucide) lucide.createIcons(); });</script>
+<script src="theme-toggle.js"></script>
+</body></html>

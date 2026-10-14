@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkEase - SMS History</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="premium.css">
+
+    <style>
+        .sms-page {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .sms-card {
+            background: #fff;
+            color: #222;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            border-left: 5px solid #22c55e;
+            box-shadow: 0 3px 12px #0001;
+            overflow-wrap: anywhere;
+        }
+
+        .sms-card p {
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
+        .sms-date {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .sms-btn {
+            padding: 10px 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            background: #16a34a;
+            color: white;
+        }
+
+        .sms-empty {
+            padding: 25px;
+            text-align: center;
+        }
+    </style>
+<link rel="stylesheet" href="luxury-black-gold.css">
+<link rel="stylesheet" href="theme-toggle.css">
+</head>
+
+<body>
+    <main class="sms-page">
+        <h1><i data-lucide="smartphone"></i> SMS History</h1>
+        <p>View your ParkEase booking notifications.</p>
+
+        <button class="sms-btn" onclick="location.href='dashboard.html'">
+            Back to Dashboard
+        </button>
+
+        <button class="sms-btn" onclick="clearHistory()">
+            Clear History
+        </button>
+
+        <div id="smsList"></div>
+    </main>
+
+    <script src="api.js"></script>
+<script>
+
+async function loadSMS(){
+ const list=document.getElementById("smsList");list.replaceChildren();
+ try {const data=await apiRequest("/api/sms");if(!data.messages.length){list.innerHTML='<div class="sms-empty">No SMS notifications yet.</div>';return;}
+ data.messages.forEach(sms=>{const card=document.createElement("div");card.className="sms-card";
+ const title=document.createElement("h3");title.textContent="<i data-lucide="check-circle"></i> "+sms.type;
+ const phone=document.createElement("p");phone.textContent="Mobile: "+sms.phone;
+ const msg=document.createElement("p");msg.textContent=sms.message;
+ const date=document.createElement("div");date.className="sms-date";date.textContent="Date: "+new Date(sms.created_at).toLocaleString();
+ card.append(title,phone,msg,date);list.appendChild(card);});
+ }catch(e){alert("Please login first.");location.href="login.html";}
+}
+async function clearHistory(){if(confirm("Delete all SMS history?")){try{await apiRequest("/api/sms",{method:"DELETE"});loadSMS();}catch(e){alert(e.message);}}}
+loadSMS();
+
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if(window.lucide) lucide.createIcons(); });</script>
+<script src="theme-toggle.js"></script>
+</body>
+</html>

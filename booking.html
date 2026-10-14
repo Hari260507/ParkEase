@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Parking Slot - ParkEase</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="luxury-black-gold.css">
+<link rel="stylesheet" href="theme-toggle.css">
+</head>
+<body>
+<div class="container">
+    <h1>Book Parking Slot</h1>
+    <p>Saved details will be filled automatically.</p>
+
+    <label for="slot">Selected Slot</label>
+    <input type="text" id="slot" readonly>
+
+    <label for="customerName">Name</label>
+    <input type="text" id="customerName" readonly>
+
+    <label for="vehicleType">Vehicle Type</label>
+    <select id="vehicleType" onchange="updateCost()" required>
+        <option value="Car">Car (4-wheeler)</option>
+        <option value="Bike">Bike (2-wheeler)</option>
+    </select>
+    <small id="vehicleTypeHint" style="display:block;margin:4px 0 12px;opacity:.8;">Vehicle type follows the selected parking slot (A = Car, B = Bike).</small>
+
+    <label for="vehicle">Vehicle Number</label>
+    <input type="text" id="vehicle" placeholder="Vehicle Number">
+
+    <label for="date">Parking Date</label>
+    <input type="date" id="date">
+
+    <label for="time">Start Time</label>
+    <input type="time" id="time">
+    <p id="showtimeHint" style="display:none;">Cinema booking: choose a movie show time below.</p>
+
+    <label for="duration">Parking Duration</label>
+    <select id="duration" onchange="checkCustom()">
+        <option value="">Select Parking Duration</option>
+        <option value="1">1 Hour</option>
+        <option value="2">2 Hours</option>
+        <option value="3">3 Hours</option>
+        <option value="4">4 Hours</option>
+        <option value="5">5 Hours</option>
+        <option value="custom">Custom Duration</option>
+    </select>
+
+    <div id="customDuration" style="display:none;">
+        <input type="number" id="customHours" placeholder="Hours" min="0" max="24">
+        <input type="number" id="customMinutes" placeholder="Minutes" min="0" max="59">
+    </div>
+
+    <p id="endTime"></p>
+    <section id="costSummary" style="margin:18px 0;padding:18px;border:1px solid #6254e8;border-radius:14px;background:rgba(99,102,241,.10);color:#e5e7ff;">
+        <h3 style="margin:0 0 10px;">Estimated Parking Cost</h3>
+        <p style="margin:6px 0;">Place: <strong id="costPlace">—</strong></p>
+        <p style="margin:6px 0;">Vehicle type: <strong id="costVehicleType">—</strong></p>
+        <p style="margin:6px 0;">Rate: <strong id="costRate">—</strong></p>
+        <p style="margin:6px 0;">Billable hours: <strong id="costHours">—</strong></p>
+        <p style="margin:12px 0 0;font-size:22px;">Estimated total: <strong id="costTotal">₹0</strong></p>
+        <small style="display:block;margin-top:8px;opacity:.8;">Demo pricing: Mall — Car ₹50/hour, Bike ₹20/hour. Cinema show — Car ₹20 per show, Bike ₹10 per show.</small>
+    </section>
+    <button onclick="confirmBooking()">Confirm Booking</button>
+    <button onclick="goDashboard()">Back to Dashboard</button>
+</div>
+
+<script src="api.js"></script>
+<script>
+
+const params=new URLSearchParams(location.search), selectedSlot=params.get("slot");
+let user=null;
+(async function init(){
+ try { user=(await apiRequest("/api/me")).user; }
+ catch(e){alert("Please login first.");location.href="login.html";return;}
+ document.getElementById("slot").value=selectedSlot||"";
+ document.getElementById("customerName").value=user.name||"";
+ document.getElementById("vehicle").value=user.vehicle||"";
+ document.getElementById("vehicleType").value=/-B\d+$/.test(selectedSlot||"")?"Bike":"Car";
+ if(/^C[1-6]-/.test(selectedSlot)){const t=document.getElementById("time"), hint=document.getElementById("showtimeHint");hint.style.display="block";const options=["09:00","12:00","15:00","18:00","21:00"];t.type="text";t.setAttribute("list","cinemaShowtimes");const dl=document.createElement("datalist");dl.id="cinemaShowtimes";options.forEach(v=>{const o=document.createElement("option");o.value=v;dl.appendChild(o)});document.body.appendChild(dl);document.getElementById("duration").value="3";}
+ if(!selectedSlot||!/^(M[1-5]|C[1-6])-([AB])([1-9]|[1-9][0-9]|100)$/.test(selectedSlot)){alert("Please select a valid parking slot.");location.href="dashboard.html";return;}
+ const placeId=selectedSlot.split("-")[0];
+ const places={M1:{name:"Phoenix Marketcity",type:"Shopping Mall",location:"Velachery Main Road, Velachery, Chennai"},M2:{name:"Express Avenue Mall",type:"Shopping Mall",location:"Whites Road, Royapettah, Chennai"},M3:{name:"VR Chennai",type:"Shopping Mall",location:"Jawaharlal Nehru Road, Anna Nagar, Chennai"},M4:{name:"Forum Vijaya Mall",type:"Shopping Mall",location:"Vadapalani, Chennai"},M5:{name:"Ampa Skywalk",type:"Shopping Mall",location:"Nelson Manickam Road, Aminjikarai, Chennai"},C1:{name:"Sathyam Cinemas",type:"Cinema Hall",location:"Royapettah, Chennai"},C2:{name:"PVR INOX Grand Galada",type:"Cinema Hall",location:"Pallavaram, Chennai"},C3:{name:"PVR Escape",type:"Cinema Hall",location:"Express Avenue, Royapettah, Chennai"},C4:{name:"AGS Cinemas",type:"Cinema Hall",location:"T. Nagar, Chennai"},C5:{name:"Rohini Silver Screens",type:"Cinema Hall",location:"Koyambedu, Chennai"},C6:{name:"Luxe Cinemas",type:"Cinema Hall",location:"Phoenix Marketcity, Velachery, Chennai"}};
+ window.selectedPlace=places[placeId]||{name:placeId,type:/^C/.test(placeId)?"Cinema Hall":"Shopping Mall",location:"Chennai"};
+ document.getElementById("costPlace").textContent=window.selectedPlace.name+" — "+window.selectedPlace.location;
+ document.getElementById("costVehicleType").textContent=document.getElementById("vehicleType").value;
+ const d=new Date();document.getElementById("date").min=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
+})();
+function checkCustom(){document.getElementById("customDuration").style.display=document.getElementById("duration").value==="custom"?"block":"none";updateEndTime();}
+function getTotalMinutes(){const v=document.getElementById("duration").value;if(v==="custom"){const h=Number(document.getElementById("customHours").value)||0,m=Number(document.getElementById("customMinutes").value)||0;if(h<0||h>24||m<0||m>59)return 0;return h*60+m;}return Number(v)*60||0;}
+function updateCost(){
+ const minutes=getTotalMinutes(),hours=minutes>0?Math.ceil(minutes/60):0;
+ const isBike=document.getElementById("vehicleType").value==="Bike";
+ const isCinema=/^C[1-6]-/.test(selectedSlot||"");
+ const rate=isCinema?(isBike?10:20):(isBike?20:50);
+ const total=isCinema?(minutes>0?rate:0):(hours*rate);
+ document.getElementById("costVehicleType").textContent=isBike?"Bike":"Car";
+ document.getElementById("costRate").textContent=isCinema?("₹"+rate+" per movie show"):("₹"+rate+" per hour");
+ document.getElementById("costHours").textContent=isCinema?(minutes>0?"One movie show":"—"):(hours?hours+ (hours===1?" hour":" hours"):"—");
+ document.getElementById("costTotal").textContent="₹"+total;
+ const expectedType=/-B\d+$/.test(selectedSlot||"")?"Bike":"Car";
+ document.getElementById("vehicleTypeHint").textContent="Selected slot "+selectedSlot+" is for "+expectedType+". Choose a matching slot for this vehicle type.";
+}
+function updateEndTime(){const d=document.getElementById("date").value,t=document.getElementById("time").value,m=getTotalMinutes();if(!d||!t||!m){document.getElementById("endTime").textContent="";return;}document.getElementById("endTime").textContent="Expected end time: "+new Date(new Date(d+"T"+t).getTime()+m*60000).toLocaleString();updateCost();}
+["date","time","duration","customHours","customMinutes"].forEach(id=>document.getElementById(id).addEventListener("input",()=>{updateEndTime();updateCost();}));
+async function confirmBooking(){
+ const vehicle=document.getElementById("vehicle").value.trim().toUpperCase(),date=document.getElementById("date").value,time=document.getElementById("time").value,duration=getTotalMinutes();
+ if(!vehicle||!date||!time||!duration){alert("Please fill all the details and select a valid duration.");return;}
+ const selectedVehicleType=document.getElementById("vehicleType").value;
+ const slotVehicleType=/-B\d+$/.test(selectedSlot||"")?"Bike":"Car";
+ if(selectedVehicleType!==slotVehicleType){alert("This slot is for "+slotVehicleType+". Please choose a matching "+selectedVehicleType.toLowerCase()+" slot from the dashboard.");return;}
+ if(duration>1440){alert("Maximum parking duration is 24 hours.");return;}
+ if(new Date(date+"T"+time)<=new Date()){alert("Please select a future date and time.");return;}
+ try {const result=await apiRequest("/api/bookings",{method:"POST",body:JSON.stringify({slot:selectedSlot,vehicle,vehicle_type:selectedVehicleType,date,time,duration})});sessionStorage.setItem("latestBookingId",result.booking.id);location.href="confirmation.html?id="+result.booking.id;}
+ catch(e){alert(e.message);}
+}
+function goDashboard(){location.href="dashboard.html";}
+updateCost();
+
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if(window.lucide) lucide.createIcons(); });</script>
+<script src="theme-toggle.js"></script>
+</body>
+</html>

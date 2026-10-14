@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ParkEase</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1>ParkEase</h1>
+    <h2>Create Account</h2>
+    <p>Register to book your parking slot</p>
+
+    <input type="text" id="name" placeholder="Full Name" autocomplete="name">
+    <input type="text" id="address" placeholder="Address" autocomplete="street-address">
+    <input type="text" id="vehicle" placeholder="Vehicle Number">
+    <input type="text" id="type" placeholder="Vehicle Type (Car / Bike)">
+    <input type="tel" id="phone" placeholder="10 Digit Mobile Number" maxlength="10" inputmode="numeric" autocomplete="tel">
+    <input type="password" id="password" placeholder="Create Password" autocomplete="new-password">
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" autocomplete="new-password">
+
+    <button onclick="register()">Create Account</button>
+    <p>Already have an account?</p>
+    <button onclick="goLogin()">Login</button>
+</div>
+
+<script src="api.js"></script>
+<script>
+
+async function register() {
+ const name=document.getElementById("name").value.trim(), address=document.getElementById("address").value.trim();
+ const vehicle=document.getElementById("vehicle").value.trim().toUpperCase(), type=document.getElementById("type").value.trim();
+ const phone=document.getElementById("phone").value.trim(), password=document.getElementById("password").value;
+ if(!name||!address||!vehicle||!type||!phone||!password||!document.getElementById("confirmPassword").value){alert("Please fill all the details.");return;}
+ if(!/^[6-9][0-9]{9}$/.test(phone)){alert("Please enter a valid 10-digit mobile number.");return;}
+ if(password.length<6){alert("Password must contain at least 6 characters.");return;}
+ if(password!==document.getElementById("confirmPassword").value){alert("Passwords do not match.");return;}
+ try { await apiRequest("/api/register",{method:"POST",body:JSON.stringify({name,address,vehicle,type,phone,password})}); alert("Account created successfully!"); location.href="login.html"; }
+ catch(e){alert(e.message);}
+}
+function goLogin(){location.href="login.html";}
+
+</script>
+</body>
+</html>

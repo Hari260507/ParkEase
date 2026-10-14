@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation - ParkEase</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <h1>Booking Confirmed!</h1>
+        <p>Your parking booking has been saved successfully.</p>
+        <button onclick="location.href='mybooking.html'">My Bookings</button>
+        <button onclick="location.href='dashboard.html'">Back to Dashboard</button>
+    </main>
+    <div id="demoSMSBox" style="display:none;position:fixed;right:20px;bottom:20px;width:320px;max-width:calc(100% - 40px);padding:20px;background:#111827;color:white;border:1px solid #22c55e;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.3);z-index:9999;font-family:Arial,sans-serif;">
+        <h3 style="margin-top:0;color:#86efac;">📱 Demo SMS Notification</h3>
+        <p id="demoSMSMessage" style="font-size:14px;line-height:1.7;white-space:pre-line;"></p>
+        <small style="color:#facc15;">Demo only — no real SMS sent.</small><br><br>
+        <button onclick="document.getElementById('demoSMSBox').style.display='none'">Close</button>
+    </div>
+    <script src="api.js"></script>
+    <script>
+    (async function(){
+        try {
+            const data = await apiRequest("/api/bookings");
+            const id = Number(new URLSearchParams(location.search).get("id") || sessionStorage.getItem("latestBookingId"));
+            const b = data.bookings.find(x => x.id === id);
+            if (!b) return;
+            document.getElementById("demoSMSMessage").textContent =
+                `To: ${b.phone}\n\nParkEase: Your parking booking is confirmed!\nSlot: ${b.slot}\nVehicle: ${b.vehicle}\nDate: ${b.date}\nTime: ${b.time}`;
+            document.getElementById("demoSMSBox").style.display = "block";
+        } catch (e) {
+            alert("Please login first.");
+            location.href = "login.html";
+        }
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Parking Management</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="premium.css">
+    <link rel="stylesheet" href="redesign-overrides.css">
+    <link rel="stylesheet" href="grand-redesign.css">
+<link rel="stylesheet" href="luxury-black-gold.css">
+<link rel="stylesheet" href="welcome-back-font-fix.css">
+<link rel="stylesheet" href="theme-toggle.css">
+</head>
+
+<body>
+
+<div class="container login-container">
+
+    <div class="login-icon"><i data-lucide="parking-circle"></i></div>
+
+    <h1>Parking Management</h1>
+
+    <h2>Welcome Back!</h2>
+
+    <p>Login to manage your parking slots</p>
+
+    <form onsubmit="event.preventDefault(); login();">
+
+        <div class="login-field">
+            <label for="phone">Mobile Number</label>
+
+            <input
+                type="tel"
+                id="phone"
+                name="username"
+                placeholder="Enter 10-digit mobile number"
+                maxlength="10"
+                inputmode="numeric"
+                autocomplete="username"
+                required>
+        </div>
+
+        <div class="login-field">
+            <label for="password">Password</label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required>
+        </div>
+
+        <button type="submit" class="login-button">
+            Login
+        </button>
+
+    </form>
+
+    <div class="login-divider"></div>
+
+    <p>Don't have an account?</p>
+
+    <button
+        type="button"
+        class="signup-button"
+        onclick="signup()">
+        Create Account
+    </button>
+
+    <p style="margin-top:20px"><a href="admin-login.html">Admin Login</a></p>
+
+</div>
+
+<script src="api.js"></script>
+<script>
+
+async function login(){
+ const phone=document.getElementById("phone").value.trim(), password=document.getElementById("password").value;
+ if(!/^[6-9][0-9]{9}$/.test(phone)){alert("Enter a valid 10-digit mobile number.");return;}
+ try { await apiRequest("/api/login",{method:"POST",body:JSON.stringify({phone,password})}); alert("Login successful!"); location.href="dashboard.html"; }
+ catch(e){alert(e.message);}
+}
+function signup(){location.href="signup.html";}
+
+</script>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if(window.lucide) lucide.createIcons(); });</script>
+<script src="theme-toggle.js"></script>
+</body>
+</html>

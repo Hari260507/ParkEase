@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation - ParkEase</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="luxury-black-gold.css">
+<link rel="stylesheet" href="theme-toggle.css">
+</head>
+<body>
+    <style>
+        .ticket-wrap{max-width:720px;margin:35px auto;padding:20px}
+        .ticket{background:#fff;color:#172033;border-radius:20px;overflow:hidden;box-shadow:0 12px 35px rgba(0,0,0,.12);border:1px solid #e5e7eb}
+        .ticket-head{background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;padding:25px;text-align:center}
+        .ticket-head h1{margin:0 0 8px;font-size:27px}.ticket-head p{margin:0}
+        .ticket-body{display:grid;grid-template-columns:1fr 180px;gap:20px;padding:25px;align-items:center}
+        .ticket-details{display:grid;grid-template-columns:1fr 1fr;gap:18px 12px}
+        .detail small{display:block;color:#64748b;font-size:12px;margin-bottom:5px}.detail strong{font-size:16px;overflow-wrap:anywhere}
+        .qr-area{text-align:center}.qr-area #qrcode{display:flex;justify-content:center;min-height:150px;align-items:center}.qr-area #qrcode img,.qr-area #qrcode canvas{max-width:150px;height:auto!important}
+        .qr-area small{color:#64748b;display:block;margin-top:8px}
+        .ticket-foot{border-top:1px dashed #cbd5e1;padding:16px 25px;color:#64748b;font-size:13px;text-align:center}
+        .ticket-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}.ticket-actions button{padding:12px 18px;border:0;border-radius:10px;cursor:pointer;font-weight:600}
+        .primary-ticket{background:#0f766e;color:white}.secondary-ticket{background:#e2e8f0;color:#0f172a}
+        @media(max-width:560px){.ticket-body{grid-template-columns:1fr}.ticket-details{order:2}.qr-area{order:1}.ticket-head h1{font-size:23px}}
+        /* Confirmation ticket: keep readable regardless of global theme styles */
+        .ticket-wrap{width:min(100% - 24px,900px)!important;max-width:900px!important;margin:36px auto!important;padding:12px!important}
+        #parkingTicket.ticket{background:#111827!important;color:#f8fafc!important;border:1px solid #d4af37!important;border-radius:22px!important;box-shadow:0 22px 60px rgba(0,0,0,.35)!important}
+        #parkingTicket .ticket-head{background:linear-gradient(135deg,#6f5211,#d4af37)!important;color:#fff!important;padding:28px 24px!important}
+        #parkingTicket .ticket-head h1,#parkingTicket .ticket-head p{color:#fff!important}
+        #parkingTicket .ticket-body{grid-template-columns:minmax(0,1fr) 200px!important;gap:28px!important;padding:28px!important}
+        #parkingTicket .detail small{color:#d4af37!important;font-size:11px!important;letter-spacing:.08em!important}
+        #parkingTicket .detail strong{display:block;color:#f8fafc!important;font-size:15px!important;line-height:1.5!important}
+        #parkingTicket .ticket-foot{background:#0b1220!important;color:#cbd5e1!important;border-top:1px dashed #d4af37!important}
+        #parkingTicket .qr-area{background:#fff!important;color:#111827!important;border-radius:16px!important;padding:16px 10px!important;border:1px solid #e5e7eb!important}
+        #parkingTicket .qr-area small{color:#334155!important;font-weight:600!important}
+        #parkingTicket #qrcode{background:#fff!important;min-height:170px!important;width:100%!important}
+        #parkingTicket #qrcode img,#parkingTicket #qrcode canvas{display:block!important;width:150px!important;height:150px!important;max-width:100%!important;object-fit:contain!important;margin:auto!important}
+        .ticket-actions button{font-size:14px!important;transition:transform .2s ease,opacity .2s ease}
+        .ticket-actions button:hover{transform:translateY(-2px);opacity:.92}
+        .primary-ticket{background:linear-gradient(135deg,#d4af37,#f3d879)!important;color:#171717!important}
+        .secondary-ticket{background:#1f2937!important;color:#f8fafc!important;border:1px solid #475569!important}
+        @media(max-width:600px){#parkingTicket .ticket-body{grid-template-columns:1fr!important;padding:20px!important}#parkingTicket .qr-area{grid-row:1}.ticket-details{grid-template-columns:1fr 1fr!important;gap:16px 10px!important}}
+        @media(max-width:380px){#parkingTicket .ticket-details{grid-template-columns:1fr!important}}
+        @media print{body{background:white!important}.ticket-wrap{margin:0 auto!important;padding:0!important}#parkingTicket.ticket{background:#fff!important;color:#111827!important;box-shadow:none!important;border:1px solid #999!important}#parkingTicket .ticket-head{background:#d4af37!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}#parkingTicket .detail strong{color:#111827!important}#parkingTicket .detail small{color:#6b4f00!important}#parkingTicket .ticket-foot{background:#fff!important;color:#475569!important}.ticket-actions,#demoSMSBox{display:none!important}}
+    </style>
+    <main class="ticket-wrap">
+        <section class="ticket" id="parkingTicket">
+            <header class="ticket-head">
+                <h1>✓ Booking Confirmed!</h1>
+                <p>Your ParkEase parking ticket is ready</p>
+            </header>
+            <div class="ticket-body">
+                <div class="ticket-details">
+                    <div class="detail"><small>BOOKING ID</small><strong id="ticketId">Loading...</strong></div>
+                    <div class="detail"><small>PARKING SLOT</small><strong id="ticketSlot">—</strong></div>
+                    <div class="detail"><small>VEHICLE NUMBER</small><strong id="ticketVehicle">—</strong></div>
+                    <div class="detail"><small>DATE</small><strong id="ticketDate">—</strong></div>
+                    <div class="detail"><small>START TIME</small><strong id="ticketTime">—</strong></div>
+                    <div class="detail"><small>DURATION</small><strong id="ticketDuration">—</strong></div>
+                    <div class="detail"><small>STATUS</small><strong id="ticketStatus">—</strong></div>
+                    <div class="detail"><small>PLACE TYPE</small><strong id="ticketPlaceType">—</strong></div>
+                    <div class="detail"><small>PLACE & LOCATION</small><strong id="ticketPlace">—</strong></div>
+                    <div class="detail"><small>ESTIMATED COST</small><strong id="ticketCost">—</strong></div>
+                </div>
+                <div class="qr-area">
+                    <div id="qrcode" aria-label="QR code for this parking ticket"></div>
+                    <small>Scan to view ticket details</small>
+                </div>
+            </div>
+            <footer class="ticket-foot">Please keep this ticket for your reference. QR code contains booking details for this demo.</footer>
+        </section>
+        <div class="ticket-actions">
+            <button class="primary-ticket" onclick="window.print()">Print / Save Ticket</button>
+            <button class="secondary-ticket" onclick="location.href='mybooking.html'">My Bookings</button>
+            <button class="secondary-ticket" onclick="location.href='dashboard.html'">Dashboard</button>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <div id="demoSMSBox" style="display:none;position:fixed;right:20px;bottom:20px;width:320px;max-width:calc(100% - 40px);padding:20px;background:#111827;color:white;border:1px solid #22c55e;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.3);z-index:9999;font-family:Arial,sans-serif;">
+        <h3 style="margin-top:0;color:#86efac;"><i data-lucide="smartphone"></i> Demo SMS Notification</h3>
+        <p id="demoSMSMessage" style="font-size:14px;line-height:1.7;white-space:pre-line;"></p>
+        <small style="color:#facc15;">Demo only — no real SMS sent.</small><br><br>
+        <button onclick="document.getElementById('demoSMSBox').style.display='none'">Close</button>
+    </div>
+    <script src="api.js"></script>
+    <script>
+    (async function(){
+        try {
+            const data = await apiRequest("/api/bookings");
+            const id = Number(new URLSearchParams(location.search).get("id") || sessionStorage.getItem("latestBookingId"));
+            const b = data.bookings.find(x => x.id === id);
+            if (!b) {
+                document.getElementById("ticketId").textContent = "Booking not found";
+                return;
+            }
+            document.getElementById("ticketId").textContent = "#PE" + String(b.id).padStart(5, "0");
+            document.getElementById("ticketSlot").textContent = b.slot;
+            document.getElementById("ticketVehicle").textContent = b.vehicle;
+            document.getElementById("ticketDate").textContent = b.date;
+            document.getElementById("ticketTime").textContent = b.time;
+            document.getElementById("ticketDuration").textContent = b.duration + " minutes";
+            document.getElementById("ticketStatus").textContent = b.status;
+            const placeId=String(b.slot||"").split("-")[0];
+            const places={M1:{name:"Phoenix Marketcity",type:"Shopping Mall",location:"Velachery Main Road, Velachery, Chennai"},M2:{name:"Express Avenue Mall",type:"Shopping Mall",location:"Whites Road, Royapettah, Chennai"},M3:{name:"VR Chennai",type:"Shopping Mall",location:"Jawaharlal Nehru Road, Anna Nagar, Chennai"},M4:{name:"Forum Vijaya Mall",type:"Shopping Mall",location:"Vadapalani, Chennai"},M5:{name:"Ampa Skywalk",type:"Shopping Mall",location:"Nelson Manickam Road, Aminjikarai, Chennai"},C1:{name:"Sathyam Cinemas",type:"Cinema Hall",location:"Royapettah, Chennai"},C2:{name:"PVR INOX Grand Galada",type:"Cinema Hall",location:"Pallavaram, Chennai"},C3:{name:"PVR Escape",type:"Cinema Hall",location:"Express Avenue, Royapettah, Chennai"},C4:{name:"AGS Cinemas",type:"Cinema Hall",location:"T. Nagar, Chennai"},C5:{name:"Rohini Silver Screens",type:"Cinema Hall",location:"Koyambedu, Chennai"},C6:{name:"Luxe Cinemas",type:"Cinema Hall",location:"Phoenix Marketcity, Velachery, Chennai"}};
+            const place=places[placeId]||{name:placeId,type:/^C/.test(placeId)?"Cinema Hall":"Shopping Mall",location:"Chennai"};
+            const isBike=/-B\d+$/.test(b.slot||""); const isCinema=/^C[1-6]-/.test(b.slot||""); const rate=isCinema?(isBike?10:20):(isBike?20:50); const hours=Math.ceil(Number(b.duration||0)/60); const cost=isCinema?rate:hours*rate;
+            document.getElementById("ticketPlaceType").textContent=place.type;
+            document.getElementById("ticketPlace").textContent=place.name+" — "+place.location;
+            document.getElementById("ticketCost").textContent=isCinema?("₹"+cost+" estimated (per movie show)"):("₹"+cost+" estimated ("+hours+" hr × ₹"+rate+")");
+            const qrDetails = `ParkEase Parking Ticket\nBooking ID: PE${String(b.id).padStart(5, "0")}\nSlot: ${b.slot}\nVehicle: ${b.vehicle}\nDate: ${b.date}\nTime: ${b.time}\nDuration: ${b.duration} minutes\nStatus: ${b.status}
+Place: ${place.name}, ${place.location}
+Estimated Cost: ₹${cost}${isCinema ? " (per movie show)" : ""}`;
+            if (window.QRCode) {
+                new QRCode(document.getElementById("qrcode"), {text: qrDetails, width:150, height:150, correctLevel: QRCode.CorrectLevel.M});
+            } else {
+                document.getElementById("qrcode").innerHTML = "<div style="padding:18px;color:#334155;font-size:13px;line-height:1.5">QR code could not load.<br>Connect to the internet and refresh this ticket.</div>";
+            }
+            document.getElementById("demoSMSMessage").textContent =
+                `To: ${b.phone}\n\nParkEase: Your parking booking is confirmed!\nSlot: ${b.slot}\nVehicle: ${b.vehicle}\nDate: ${b.date}\nTime: ${b.time}`;
+            document.getElementById("demoSMSBox").style.display = "block";
+        } catch (e) {
+            alert("Please login first.");
+            location.href = "login.html";
+        }
+    })();
+    </script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if(window.lucide) lucide.createIcons(); });</script>
+<script src="theme-toggle.js"></script>
+</body>
+</html>

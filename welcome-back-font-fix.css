@@ -1,0 +1,11 @@
+/* Fix the Welcome Back heading on the login page */
+.login-container h2 {
+  font-family: 'Outfit', 'Manrope', 'Segoe UI', sans-serif !important;
+  font-size: clamp(28px, 4vw, 36px) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.8px !important;
+  line-height: 1.2 !important;
+  color: #D4AF37 !important;
+  -webkit-text-fill-color: #D4AF37 !important;
+  text-shadow: 0 2px 18px rgba(212, 175, 55, 0.18) !important;
+}
