@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,34 +6,367 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Confirmation - ParkEase</title>
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            background: #09090b;
+            color: #f8fafc;
+            font-family: Arial, sans-serif;
+            padding: 30px 16px;
+        }
+
+        .ticket {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #111827;
+            border: 1px solid #eab308;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px #0008;
+        }
+
+        .ticket-header {
+            background: linear-gradient(120deg, #806016, #d4af37);
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .ticket-header h1 {
+            margin: 0 0 15px;
+            font-size: clamp(26px, 4vw, 40px);
+            color: white;
+        }
+
+        .ticket-header p {
+            margin: 0;
+            font-size: 19px;
+            color: white;
+        }
+
+        .ticket-content {
+            padding: 38px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 250px;
+            gap: 28px;
+        }
+
+        .detail {
+            margin-bottom: 32px;
+            overflow-wrap: anywhere;
+        }
+
+        .detail-label {
+            color: #facc15;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .qr-box {
+            align-self: center;
+            background: white;
+            color: #1e293b;
+            padding: 18px;
+            border-radius: 22px;
+            text-align: center;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            min-height: 180px;
+            align-items: center;
+        }
+
+        #qrcode img, #qrcode canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .qr-box p {
+            margin: 15px 0 0;
+            font-size: 14px;
+        }
+
+        .ticket-footer {
+            border-top: 1px dashed #d4af37;
+            padding: 24px;
+            text-align: center;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 30px auto;
+        }
+
+        .actions button {
+            padding: 14px 24px;
+            border: 1px solid #475569;
+            border-radius: 14px;
+            background: #1e293b;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .actions button:first-child {
+            background: #d4af37;
+            color: #111827;
+        }
+
+        #errorMessage {
+            text-align: center;
+            color: #fca5a5;
+            padding: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .ticket-content {
+                grid-template-columns: 1fr 1fr;
+                padding: 24px;
+                gap: 15px;
+            }
+
+            .qr-box {
+                grid-column: 1 / -1;
+                justify-self: center;
+                width: min(250px, 100%);
+                box-sizing: border-box;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 14px 8px;
+            }
+
+            .ticket {
+                border-radius: 20px;
+            }
+
+            .ticket-content {
+                grid-template-columns: 1fr;
+                padding: 22px;
+            }
+
+            .detail {
+                margin-bottom: 20px;
+            }
+
+            .qr-box {
+                grid-column: auto;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+                padding: 0;
+            }
+
+            .ticket {
+                box-shadow: none;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .actions, #demoSMSBox {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <main class="container">
-        <h1>Booking Confirmed!</h1>
-        <p>Your parking booking has been saved successfully.</p>
-        <button onclick="location.href='mybooking.html'">My Bookings</button>
-        <button onclick="location.href='dashboard.html'">Back to Dashboard</button>
+    <main>
+        <section class="ticket">
+            <header class="ticket-header">
+                <h1>✓ Booking Confirmed!</h1>
+                <p>Your ParkEase parking ticket is ready</p>
+            </header>
+
+            <div id="errorMessage" role="alert" hidden></div>
+
+            <section class="ticket-content" id="ticketContent">
+                <div>
+                    <div class="detail">
+                        <div class="detail-label">BOOKING ID</div>
+                        <div class="detail-value" id="ticketId">Loading...</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">VEHICLE NUMBER</div>
+                        <div class="detail-value" id="vehicle">—</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">START TIME</div>
+                        <div class="detail-value" id="startTime">—</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">STATUS</div>
+                        <div class="detail-value" id="status">—</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">PLACE & LOCATION</div>
+                        <div class="detail-value" id="place">—</div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="detail">
+                        <div class="detail-label">PARKING SLOT</div>
+                        <div class="detail-value" id="slot">—</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">DATE</div>
+                        <div class="detail-value" id="date">—</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">DURATION</div>
+                        <div class="detail-value" id="duration">—</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">PLACE TYPE</div>
+                        <div class="detail-value" id="placeType">—</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">ESTIMATED COST</div>
+                        <div class="detail-value" id="cost">—</div>
+                    </div>
+                </div>
+
+                <div class="qr-box">
+                    <div id="qrcode">
+                        <span style="color:#64748b">Generating QR...</span>
+                    </div>
+                    <p>Scan to view ticket details</p>
+                </div>
+            </section>
+
+            <footer class="ticket-footer">
+                Please keep this ticket for your reference.
+                QR code contains booking details for this demo.
+            </footer>
+        </section>
+
+        <div class="actions">
+            <button onclick="window.print()">Print / Save Ticket</button>
+            <button onclick="location.href='mybooking.html'">My Bookings</button>
+            <button onclick="location.href='dashboard.html'">Dashboard</button>
+        </div>
     </main>
-    <div id="demoSMSBox" style="display:none;position:fixed;right:20px;bottom:20px;width:320px;max-width:calc(100% - 40px);padding:20px;background:#111827;color:white;border:1px solid #22c55e;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.3);z-index:9999;font-family:Arial,sans-serif;">
-        <h3 style="margin-top:0;color:#86efac;">📱 Demo SMS Notification</h3>
-        <p id="demoSMSMessage" style="font-size:14px;line-height:1.7;white-space:pre-line;"></p>
-        <small style="color:#facc15;">Demo only — no real SMS sent.</small><br><br>
+
+    <div id="demoSMSBox"
+         style="display:none;position:fixed;right:20px;bottom:20px;width:320px;max-width:calc(100% - 40px);box-sizing:border-box;padding:20px;background:#111827;color:white;border:1px solid #22c55e;border-radius:14px;box-shadow:0 8px 30px #0008;z-index:9999;">
+        <h3 style="color:#86efac">📱 Demo SMS Notification</h3>
+        <p id="demoSMSMessage" style="font-size:14px;line-height:1.7;white-space:pre-line"></p>
+        <small style="color:#facc15">Demo only — no real SMS sent.</small>
+        <br><br>
         <button onclick="document.getElementById('demoSMSBox').style.display='none'">Close</button>
     </div>
+
     <script src="api.js"></script>
+
     <script>
-    (async function(){
+    (async function () {
+        const showError = (message) => {
+            const el = document.getElementById("errorMessage");
+            el.textContent = message;
+            el.hidden = false;
+        };
+
+        const put = (id, value) => {
+            document.getElementById(id).textContent =
+                value === null || value === undefined || value === ""
+                    ? "—" : String(value);
+        };
+
         try {
+            const params = new URLSearchParams(location.search);
+            const rawId = params.get("id") || sessionStorage.getItem("latestBookingId");
+
+            if (!rawId) {
+                showError("Booking ID missing. Open My Bookings and select your booking.");
+                document.getElementById("ticketId").textContent = "Not found";
+                return;
+            }
+
             const data = await apiRequest("/api/bookings");
-            const id = Number(new URLSearchParams(location.search).get("id") || sessionStorage.getItem("latestBookingId"));
-            const b = data.bookings.find(x => x.id === id);
-            if (!b) return;
+            const bookings = Array.isArray(data)
+                ? data
+                : (data.bookings || []);
+
+            const booking = bookings.find(
+                item => String(item.id) === String(rawId)
+            );
+
+            if (!booking) {
+                showError("Booking not found in your account. Please check My Bookings.");
+                document.getElementById("ticketId").textContent = rawId;
+                return;
+            }
+
+            put("ticketId", booking.id);
+            put("vehicle", booking.vehicle || booking.vehicle_number);
+            put("startTime", booking.time || booking.start_time);
+            put("status", booking.status);
+            put("place", booking.location || booking.place || booking.mall_name);
+            put("slot", booking.slot);
+            put("date", booking.date);
+            put("duration", booking.duration || booking.duration_hours);
+            put("placeType", booking.place_type || booking.type);
+            put("cost", booking.cost ?? booking.estimated_cost);
+
+            const qrData = JSON.stringify({
+                bookingId: booking.id,
+                slot: booking.slot,
+                vehicle: booking.vehicle || booking.vehicle_number,
+                date: booking.date,
+                time: booking.time || booking.start_time,
+                status: booking.status
+            });
+
+            const qr = document.getElementById("qrcode");
+            qr.innerHTML = "";
+
+            if (typeof QRCode !== "undefined") {
+                new QRCode(qr, {
+                    text: qrData,
+                    width: 180,
+                    height: 180,
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } else {
+                qr.textContent = "QR library unavailable";
+            }
+
             document.getElementById("demoSMSMessage").textContent =
-                `To: ${b.phone}\n\nParkEase: Your parking booking is confirmed!\nSlot: ${b.slot}\nVehicle: ${b.vehicle}\nDate: ${b.date}\nTime: ${b.time}`;
+                `ParkEase: Your parking booking is confirmed!\n` +
+                `Booking ID: ${booking.id}\n` +
+                `Slot: ${booking.slot}\n` +
+                `Vehicle: ${booking.vehicle || booking.vehicle_number || "—"}\n` +
+                `Date: ${booking.date || "—"}\n` +
+                `Time: ${booking.time || booking.start_time || "—"}`;
+
             document.getElementById("demoSMSBox").style.display = "block";
-        } catch (e) {
-            alert("Please login first.");
-            location.href = "login.html";
+
+        } catch (error) {
+            console.error("Booking confirmation error:", error);
+            showError("Unable to load booking details. Please login and check My Bookings.");
         }
     })();
     </script>
